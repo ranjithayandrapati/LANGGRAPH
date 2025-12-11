@@ -116,5 +116,3 @@ Planned items (prioritize and update as needed):
 Acknowledgements
 ----------------
 - Thanks to the open-source LLM community and tooling projects that inspired LANGGRAPH.
-- Add screenshots (for UI) and real example outputs.
-- Add badges for CI, coverage, and PyPI/npm when available.
