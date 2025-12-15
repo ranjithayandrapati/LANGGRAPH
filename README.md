@@ -4,11 +4,6 @@ LANGGRAPH — a lightweight framework and toolkit for designing, composing, and 
 
 Think of LANGGRAPH as a way to build pipelines where nodes are language model prompts or transformation steps and edges represent dataflow between them. It is useful for chaining LLM prompts, combining tool calls, orchestrating multi-step reasoning, and visualizing / testing those flows.
 
-> NOTE: This README is a complete, editable template. Replace the example commands, API snippets, and placeholders to match the actual implementation in this repository.
-
-Badges
-- [Build status] [License] [Coverage] — (add your badges here)
-
 Table of Contents
 - [Overview](#overview)
 - [Key features](#key-features)
