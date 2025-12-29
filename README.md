@@ -1,5 +1,74 @@
 # LANGGRAPH
 
+
+                    ┌───────────────────────────────┐
+                    │ 1) You ask a question (text)  │
+                    │   "What is (87*12)/3 ?"       │
+                    └───────────────┬───────────────┘
+                                    │
+                                    v
+┌──────────────────────────────────────────────────────────────────┐
+│ 2) Build chat messages (System + User + previous history)         │
+│   [System]: "Output ONLY one JSON..."                             │
+│   [User]  : "What is (87*12)/3 ?"                                 │
+└───────────────────────────────┬──────────────────────────────────┘
+                                │
+                                v
+┌──────────────────────────────────────────────────────────────────┐
+│ 3) HF Chat Template (apply_chat_template)                         │
+│   Messages -> one formatted prompt string for the model           │
+└───────────────────────────────┬──────────────────────────────────┘
+                                │
+                                v
+┌──────────────────────────────────────────────────────────────────┐
+│ 4) Tokenizer                                                      │
+│   Prompt text -> input_ids (numbers) + attention_mask             │
+└───────────────────────────────┬──────────────────────────────────┘
+                                │
+                                v
+┌──────────────────────────────────────────────────────────────────┐
+│ 5) Model.generate()                                               │
+│   input_ids -> predicts next tokens repeatedly (new token IDs)    │
+└───────────────────────────────┬──────────────────────────────────┘
+                                │
+                                v
+┌──────────────────────────────────────────────────────────────────┐
+│ 6) Decode                                                         │
+│   new token IDs -> model output text                              │
+│   Example: {"tool":"calculator","args":{"expression":"(87*12)/3"}} │
+└───────────────────────────────┬──────────────────────────────────┘
+                                │
+                                v
+┌──────────────────────────────────────────────────────────────────┐
+│ 7) LangGraph Router (decision)                                    │
+│   If tool == "calculator" -> go run tool                          │
+│   If tool == "final"      -> END                                  │
+└───────────────────────────────┬──────────────────────────────────┘
+                                │
+                    tool needed │ yes
+                                v
+┌──────────────────────────────────────────────────────────────────┐
+│ 8) Tool Node (Python function)                                    │
+│   calculator("(87*12)/3") -> "348.0"                               │
+│   Save as ToolMessage: "Tool result: 348.0"                       │
+└───────────────────────────────┬──────────────────────────────────┘
+                                │
+                                v
+                ┌────────────────────────────────────┐
+                │ 9) Loop back to Agent (Step 2)     │
+                │  Now model sees the tool result     │
+                └───────────────────┬────────────────┘
+                                    │
+                                    v
+                     (same tokenize -> generate -> decode)
+                                    │
+                                    v
+┌──────────────────────────────────────────────────────────────────┐
+│ Final model output:                                                │
+│ {"tool":"final","args":{"answer":"(87*12)/3 = 348"}}               │
+└──────────────────────────────────────────────────────────────────┘
+
+
 LANGGRAPH — a lightweight framework and toolkit for designing, composing, and executing language-model-driven graph workflows.
 
 Think of LANGGRAPH as a way to build pipelines where nodes are language model prompts or transformation steps and edges represent dataflow between them. It is useful for chaining LLM prompts, combining tool calls, orchestrating multi-step reasoning, and visualizing / testing those flows.
